@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Professional Portfolio - GitHub Projects</title>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" /> 
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+<header>
+  <div class="container">
+    <h1>My Professional Portfolio</h1>
+    <p>Showcasing all my project websites from GitHub repositories</p>
+    <button id="darkModeToggle" aria-label="Toggle dark mode" title="Toggle dark mode">
+      <span class="material-icons" aria-hidden="true">dark_mode</span>
+    </button>
+  </div>
+</header>
+
+<main class="container" role="main" aria-live="polite" aria-busy="false">
+  <div id="loading" class="status-message">Loading projects, please wait...</div>
+  <div id="error-message" class="status-message error" role="alert" hidden></div>
+  <button id="retry-btn" class="btn retry" style="display:none;">Retry</button>
+  <section id="projects" class="projects-grid" aria-label="GitHub project repositories"></section>
+</main>
+
+<footer>
+  <div>
+    &copy; <span id="year"></span> <a href="https://github.com/satria-afif" target="_blank" rel="noopener noreferrer" id="github-profile-link">GitHub Profile</a>
+  </div>
+</footer>
+
+<script src="scripts.js"></script>
+</body>
+</html>

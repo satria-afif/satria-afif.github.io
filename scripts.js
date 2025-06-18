@@ -206,7 +206,7 @@ function renderProjectCard(repo) {
   // Stars
   const stars = document.createElement('div');
   stars.className = 'meta-item';
-  stars.innerHTML = <span class="material-icons" aria-hidden="true">star</span>;
+  stars.innerHTML = '<span class="material-icons" aria-hidden="true">star</span> ';
   stars.appendChild(document.createTextNode(formatNumber(repo.stargazers_count)));
 
   // Language

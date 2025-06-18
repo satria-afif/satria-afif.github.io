@@ -1,14 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Professional Portfolio - GitHub Projects</title>
+  <title>My Professional Portfolio</title>
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
 </head>
-
 <body>
   <header>
     <div class="container">
@@ -29,39 +27,10 @@
 
   <footer>
     <div>
-      &copy; <span id="year"></span> <a href="https://github.com/satria-afif/satria-afif.github.io/" target="_blank"
-        rel="noopener noreferrer" id="github-profile-link">GitHub Profile</a>
+      &copy; <span id="year"></span> <a href="https://github.com/YOUR_GITHUB_USERNAME" target="_blank" rel="noopener noreferrer" id="github-profile-link">GitHub Profile</a>
     </div>
   </footer>
 
-  <div id="projectModal" class="modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="modalTitle"
-    aria-describedby="modalDescription">
-    <div class="modal-overlay" tabindex="-1" data-close-modal></div>
-    <div class="modal-content" role="document">
-      <button class="modal-close-btn" aria-label="Close detail view" data-close-modal>
-        <span class="material-icons">close</span>
-      </button>
-      <h2 id="modalTitle" class="modal-title"></h2>
-      <div class="modal-body">
-        <img id="modalImage" alt="" class="modal-image" />
-        <div class="modal-text">
-          <p id="modalDescription" class="modal-description"></p>
-          <ul class="modal-meta-list" aria-label="Project details">
-            <li><strong>Language:</strong><span id="modalLanguage"></span></li>
-            <li><strong>Stars:</strong><span id="modalStars"></span></li>
-            <li><strong>Last Updated:</strong><time id="modalUpdated"></time></li>
-            <li><strong>Created On:</strong><time id="modalCreated"></time></li>
-          </ul>
-          <p>
-            <a id="modalRepoLink" href="#" target="_blank" rel="noopener noreferrer" class="btn btn-primary"
-              aria-label="Open GitHub repository in new tab">View on GitHub/<a>
-          </p>
-        </div>
-      </div>
-    </div>
-  </div>
-
   <script src="scripts.js"></script>
-
 </body>
 </html>

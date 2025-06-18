@@ -180,21 +180,21 @@ if (modal) {
 function renderProjectCard(repo) {
   const card = document.createElement('article');
   card.className = 'project-card';
-  card.tabIndex = 0; // make focusable
 
-  // Card content container (simulates link area)
-  const cardContent = document.createElement('div');
-  cardContent.className = 'card-content';
-  cardContent.style.cursor = 'pointer';
+  // Title link to project.html?repo={repo.name}
+  const repoLink = `project.html?repo=${encodeURIComponent(repo.name)}`;
 
-  const title = document.createElement('h3');
-  title.className = 'project-title-link';
-  title.textContent = repo.name;
+  // Create title link
+  const titleLink = document.createElement('a');
+  titleLink.className = 'project-title-link';
+  titleLink.href = repoLink;
+  titleLink.textContent = repo.name;
+  titleLink.setAttribute('aria-label', `Go to detail page for ${repo.name}`);
 
   const icon = document.createElement('span');
   icon.className = 'material-icons';
   icon.textContent = 'open_in_new';
-  title.appendChild(icon);
+  titleLink.appendChild(icon);
 
   const desc = document.createElement('p');
   desc.className = 'project-description';
@@ -206,7 +206,7 @@ function renderProjectCard(repo) {
   // Stars
   const stars = document.createElement('div');
   stars.className = 'meta-item';
-  stars.innerHTML = '<span class="material-icons" aria-hidden="true">star</span> ';
+  stars.innerHTML = 'span class="material-icons" aria-hidden="true">star/span> ';
   stars.appendChild(document.createTextNode(formatNumber(repo.stargazers_count)));
 
   // Language
@@ -221,22 +221,9 @@ function renderProjectCard(repo) {
   meta.appendChild(stars);
   meta.appendChild(lang);
 
-  cardContent.appendChild(title);
-  cardContent.appendChild(desc);
-  cardContent.appendChild(meta);
-
-  card.appendChild(cardContent);
-
-  // Click event opens modal
-  cardContent.addEventListener('click', () => openProjectModal(repo));
-  // Also open modal on keyboard "Enter" or "Space" key on cardContent
-  cardContent.tabIndex = 0;
-  cardContent.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault();
-      openProjectModal(repo);
-    }
-  });
+  card.appendChild(titleLink);
+  card.appendChild(desc);
+  card.appendChild(meta);
 
   return card;
 }

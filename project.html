@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Project Detail</title>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+<link rel="stylesheet" href="styles.css" />
+<style>
+  /* Layout for detail page */
+  body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+  main.container {
+    flex: 1 0 auto;
+    max-width: 900px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+  }
+  h1 {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+  }
+  img.project-screenshot {
+    width: 100%;
+    max-height: 400px;
+    object-fit: contain;
+    border-radius: 16px;
+    box-shadow: 0 8px 30px rgba(3,102,214,0.3);
+    margin-bottom: 1.5rem;
+  }
+  .project-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    color: var(--color-text-secondary);
+  }
+  .project-meta span.material-icons {
+    vertical-align: middle;
+    margin-right: 0.3rem;
+  }
+  .project-description {
+    font-size: 1.1rem;
+    color: var(--color-text);
+    margin-bottom: 2rem;
+  }
+  a.btn-primary {
+    background-color: var(--color-button-bg);
+    color: var(--color-button-text);
+    padding: 12px 32px;
+    border-radius: 24px;
+    font-weight: 600;
+    font-size: 1rem;
+    text-decoration: none;
+    user-select: none;
+    display: inline-block;
+    transition: background-color 0.3s ease;
+  }
+  a.btn-primary:hover,
+  a.btn-primary:focus {
+    background-color: var(--color-button-hover-bg);
+    outline: none;
+  }
+  nav {
+    margin: 1rem 0;
+  }
+  nav a {
+    color: var(--color-link);
+    text-decoration: none;
+    font-weight: 600;
+  }
+  nav a:hover,
+  nav a:focus {
+    text-decoration: underline;
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="container">
+    <h1 id="project-name">Loading...</h1>
+    <nav>
+      <a href="index.html">&larr; Back to Portfolio</a>
+    </nav>
+  </div>
+</header>
+<main class="container" role="main" aria-live="polite">
+  <img id="project-screenshot" class="project-screenshot" alt="Project screenshot" src="" />
+  <div class="project-meta" aria-label="Project details">
+    <div><span class="material-icons" aria-hidden="true">calendar_today</span>Created on: <time id="created-date"></time></div>
+    <div><span class="material-icons" aria-hidden="true">calendar_today</span>Last updated: <time id="updated-date"></time></div>
+    <div><span class="material-icons" aria-hidden="true">star</span>Stars: <span id="stars-count"></span></div>
+    <div><span class="material-icons" aria-hidden="true">code</span>Language: <span id="language"></span></div>
+  </div>
+  <p id="project-description" class="project-description"></p>
+  <a id="github-link" href="#" target="_blank" rel="noopener noreferrer" class="btn-primary" aria-label="Open GitHub repository in new tab">View on GitHub</a>
+</main>
+
+<script>
+  // Your GitHub username here
+  const GITHUB_USERNAME = 'YOUR_GITHUB_USERNAME';
+
+  // Helper to get query parameter
+  function getQueryParam(param) {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get(param);
+  }
+
+  function formatDate(dateStr) {
+    if (!dateStr) return 'Unknown';
+    const options = { year: 'numeric', month: 'short', day: 'numeric' };
+    try {
+      return new Date(dateStr).toLocaleDateString(undefined, options);
+    } catch {
+      return dateStr;
+    }
+  }
+
+  // Generate placeholder screenshot URL with descriptive alt
+  function getScreenshotUrl(repoName) {
+    const baseUrl = 'https://placehold.co/800x400/059669/ffffff/png';
+    const text = encodeURIComponent(`${repoName} Screenshot`);
+    return `${baseUrl}?text=${text}`;
+  }
+
+  async function fetchRepo(repoName) {
+    const apiUrl = `https://api.github.com/repos/${GITHUB_USERNAME}/${repoName}`;
+    const response = await fetch(apiUrl);
+    if (!response.ok) throw new Error('Repository not found');
+    return response.json();
+  }
+
+  async function init() {
+    const repoName = getQueryParam('repo');
+
+    if (!repoName) {
+      document.getElementById('project-name').textContent = 'Error: No project specified.';
+      return;
+    }
+
+    try {
+      const repo = await fetchRepo(repoName);
+
+      document.title = `${repo.name} - Project Detail`;
+
+      document.getElementById('project-name').textContent = repo.name;
+      document.getElementById('project-screenshot').src = getScreenshotUrl(repo.name);
+      document.getElementById('project-screenshot').alt = `Screenshot preview of the project ${repo.name}`;
+      document.getElementById('created-date').textContent = formatDate(repo.created_at);
+      document.getElementById('updated-date').textContent = formatDate(repo.updated_at);
+      document.getElementById('stars-count').textContent = repo.stargazers_count;
+      document.getElementById('language').textContent = repo.language || 'Unknown';
+      document.getElementById('project-description').textContent = repo.description || 'No detailed description provided.';
+      const githubLink = document.getElementById('github-link');
+      githubLink.href = repo.html_url;
+    } catch (error) {
+      document.getElementById('project-name').textContent = 'Error loading project.';
+      document.getElementById('project-description').textContent = error.message;
+      // Hide other elements on error
+      document.getElementById('project-screenshot').style.display = 'none';
+      document.querySelector('.project-meta').style.display = 'none';
+      document.getElementById('github-link').style.display = 'none';
+    }
+  }
+
+  window.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>

@@ -11,6 +11,23 @@ const yearSpan = document.getElementById('year');
 const githubProfileLink = document.getElementById('github-profile-link');
 const darkModeToggleBtn = document.getElementById('darkModeToggle');
 
+// Modal elements
+const modal = document.getElementById('projectModal');
+const modalTitle = document.getElementById('modalTitle');
+const modalImage = document.getElementById('modalImage');
+const modalDescription = document.getElementById('modalDescription');
+const modalLanguage = document.getElementById('modalLanguage');
+const modalStars = document.getElementById('modalStars');
+const modalUpdated = document.getElementById('modalUpdated');
+const modalCreated = document.getElementById('modalCreated');
+const modalRepoLink = document.getElementById('modalRepoLink');
+const modalCloseBtns = modal ? modal.querySelectorAll('[data-close-modal]') : [];
+
+// Ensure modal elements exist
+if (!modal) {
+  console.error('Modal element not found');
+}
+
 // Utility: Create element with optional classes, text, html, attributes
 function createElement(tag, options = {}) {
   const el = document.createElement(tag);
@@ -53,52 +70,173 @@ async function fetchRepos(username) {
   return results;
 }
 
-// Create a project card DOM node from a repository
+// Format ISO date string to a readable date
+function formatDate(dateStr) {
+  if (!dateStr) return 'Unknown';
+  const options = { year: 'numeric', month: 'short', day: 'numeric' };
+  try {
+    return new Date(dateStr).toLocaleDateString(undefined, options);
+  } catch {
+    return dateStr;
+  }
+}
+
+// Generate placeholder screenshot URL with descriptive alt
+function getScreenshotUrl(repoName) {
+  const baseUrl = 'https://placehold.co/400x240/059669/ffffff/png';
+  const text = encodeURIComponent(`${repoName} Screenshot`);
+  return `${baseUrl}?text=${text}`;
+}
+
+// Open modal and fill details
+function openProjectModal(repo) {
+  lastFocusedElement = document.activeElement;
+
+  modalTitle.textContent = repo.name;
+  modalImage.src = getScreenshotUrl(repo.name);
+  modalImage.alt = `Screenshot preview of the project ${repo.name}`;
+  modalDescription.textContent = repo.description || 'No detailed description provided.';
+  modalLanguage.textContent = repo.language || 'Unknown';
+  modalStars.textContent = formatNumber(repo.stargazers_count);
+  modalUpdated.textContent = formatDate(repo.updated_at);
+  modalUpdated.setAttribute('datetime', repo.updated_at);
+  modalCreated.textContent = formatDate(repo.created_at);
+  modalCreated.setAttribute('datetime', repo.created_at);
+  modalRepoLink.href = repo.html_url;
+
+  // Show modal
+  modal.setAttribute('aria-hidden', 'false');
+  trapFocus(modal);
+  document.body.style.overflow = 'hidden';
+}
+
+// Close modal and restore focus
+function closeProjectModal() {
+  modal.setAttribute('aria-hidden', 'true');
+  document.body.style.overflow = '';
+  if (lastFocusedElement) {
+    lastFocusedElement.focus();
+  }
+}
+
+// Trap keyboard focus inside the modal
+function trapFocus(element) {
+  const focusableElementsSelector =
+    'a[href], area[href], input:not([disabled]), select:not([disabled]), ' +
+    'textarea:not([disabled]), button:not([disabled]), iframe, object, embed, ' +
+    '[tabindex="0"], [contenteditable]';
+  const focusableElements = element.querySelectorAll(focusableElementsSelector);
+  if (focusableElements.length === 0) return;
+
+  const firstFocusable = focusableElements[0];
+  const lastFocusable = focusableElements[focusableElements.length - 1];
+
+  element.addEventListener('keydown', function (e) {
+    const isTabPressed = e.key === 'Tab' || e.keyCode === 9;
+    if (!isTabPressed) return;
+
+    if (e.shiftKey) {
+      if (document.activeElement === firstFocusable) {
+        e.preventDefault();
+        lastFocusable.focus();
+      }
+    } else {
+      if (document.activeElement === lastFocusable) {
+        e.preventDefault();
+        firstFocusable.focus();
+      }
+    }
+  });
+
+  // Set initial focus
+  firstFocusable.focus();
+}
+
+// Event listeners for modal close buttons and overlay
+if (modalCloseBtns.length > 0) {
+  modalCloseBtns.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      closeProjectModal();
+    });
+  });
+}
+
+// Close modal on Escape key press
+window.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && modal.getAttribute('aria-hidden') === 'false') {
+    e.preventDefault();
+    closeProjectModal();
+  }
+});
+
+// Close modal if clicking outside content area (overlay)
+if (modal) {
+  modal.querySelector('.modal-overlay').addEventListener('click', () => {
+    closeProjectModal();
+  });
+}
+
+// Override project card rendering to open modal instead of link
 function renderProjectCard(repo) {
-  const card = createElement('article', { className: 'project-card' });
+  const card = document.createElement('article');
+  card.className = 'project-card';
   card.tabIndex = 0; // make focusable
 
-  // Link preference: homepage or fallback to repo url
-  const projectLink = repo.homepage && repo.homepage.trim() !== '' ? repo.homepage : repo.html_url;
+  // Card content container (simulates link area)
+  const cardContent = document.createElement('div');
+  cardContent.className = 'card-content';
+  cardContent.style.cursor = 'pointer';
 
-  const titleLink = createElement('a', {
-    className: 'project-title-link',
-    text: repo.name,
-    attrs: {
-      href: projectLink,
-      target: '_blank',
-      rel: 'noopener noreferrer',
-      'aria-label': `Open project ${repo.name} in new tab`,
-    },
-  });
+  const title = document.createElement('h3');
+  title.className = 'project-title-link';
+  title.textContent = repo.name;
 
-  // External link icon
-  const icon = createElement('span', { className: 'material-icons', text: 'open_in_new' });
-  titleLink.appendChild(icon);
+  const icon = document.createElement('span');
+  icon.className = 'material-icons';
+  icon.textContent = 'open_in_new';
+  title.appendChild(icon);
 
-  const desc = createElement('p', {
-    className: 'project-description',
-    text: repo.description || 'No description provided.',
-  });
+  const desc = document.createElement('p');
+  desc.className = 'project-description';
+  desc.textContent = repo.description || 'No description provided.';
 
-  const meta = createElement('div', { className: 'project-meta' });
+  const meta = document.createElement('div');
+  meta.className = 'project-meta';
 
   // Stars
-  const stars = createElement('div', { className: 'meta-item' });
+  const stars = document.createElement('div');
+  stars.className = 'meta-item';
   stars.innerHTML = '<span class="material-icons" aria-hidden="true">star</span> ';
   stars.appendChild(document.createTextNode(formatNumber(repo.stargazers_count)));
 
   // Language
-  const lang = createElement('div', { className: 'meta-item', text: repo.language || 'Unknown' });
-  const langIcon = createElement('span', { className: 'material-icons', text: 'code' });
+  const lang = document.createElement('div');
+  lang.className = 'meta-item';
+  lang.textContent = repo.language || 'Unknown';
+  const langIcon = document.createElement('span');
+  langIcon.className = 'material-icons';
+  langIcon.textContent = 'code';
   lang.prepend(langIcon);
 
   meta.appendChild(stars);
   meta.appendChild(lang);
 
-  card.appendChild(titleLink);
-  card.appendChild(desc);
-  card.appendChild(meta);
+  cardContent.appendChild(title);
+  cardContent.appendChild(desc);
+  cardContent.appendChild(meta);
+
+  card.appendChild(cardContent);
+
+  // Click event opens modal
+  cardContent.addEventListener('click', () => openProjectModal(repo));
+  // Also open modal on keyboard "Enter" or "Space" key on cardContent
+  cardContent.tabIndex = 0;
+  cardContent.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      openProjectModal(repo);
+    }
+  });
 
   return card;
 }
@@ -156,8 +294,17 @@ retryBtn.addEventListener('click', () => {
 });
 
 // Update footer year and profile link dynamically
-yearSpan.textContent = new Date().getFullYear();
-githubProfileLink.href = `https://github.com/${GITHUB_USERNAME}`;
+if (yearSpan) {
+  yearSpan.textContent = new Date().getFullYear();
+} else {
+  console.error('yearSpan element not found');
+}
+
+if (githubProfileLink) {
+  githubProfileLink.href = `https://github.com/${GITHUB_USERNAME}`;
+} else {
+  console.error('githubProfileLink element not found');
+}
 
 // Dark mode toggle feature
 function setDarkMode(enabled) {
@@ -191,10 +338,14 @@ function initDarkMode() {
 }
 
 // Toggle dark mode button event listener
-darkModeToggleBtn.addEventListener('click', () => {
-  const isDark = document.body.classList.contains('dark-mode');
-  setDarkMode(!isDark);
-});
+if (darkModeToggleBtn) {
+  darkModeToggleBtn.addEventListener('click', () => {
+    const isDark = document.body.classList.contains('dark-mode');
+    setDarkMode(!isDark);
+  });
+} else {
+  console.error('darkModeToggleBtn element not found');
+}
 
 // Initialize page on DOM content loaded
 window.addEventListener('DOMContentLoaded', () => {

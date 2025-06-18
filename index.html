@@ -1,36 +1,67 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Professional Portfolio - GitHub Projects</title>
-<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" /> 
-<link rel="stylesheet" href="styles.css" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Professional Portfolio - GitHub Projects</title>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
 </head>
+
 <body>
-<header>
-  <div class="container">
-    <h1>My Professional Portfolio</h1>
-    <p>Showcasing all my project websites from GitHub repositories</p>
-    <button id="darkModeToggle" aria-label="Toggle dark mode" title="Toggle dark mode">
-      <span class="material-icons" aria-hidden="true">dark_mode</span>
-    </button>
+  <header>
+    <div class="container">
+      <h1>My Professional Portfolio</h1>
+      <p>Showcasing all my project websites from GitHub repositories</p>
+      <button id="darkModeToggle" aria-label="Toggle dark mode" title="Toggle dark mode">
+        <span class="material-icons" aria-hidden="true">dark_mode</span>
+      </button>
+    </div>
+  </header>
+
+  <main class="container" role="main" aria-live="polite" aria-busy="false">
+    <div id="loading" class="status-message">Loading projects, please wait...</div>
+    <div id="error-message" class="status-message error" role="alert" hidden></div>
+    <button id="retry-btn" class="btn retry" style="display:none;">Retry</button>
+    <section id="projects" class="projects-grid" aria-label="GitHub project repositories"></section>
+  </main>
+
+  <footer>
+    <div>
+      &copy; <span id="year"></span> <a href="https://github.com/satria-afif/satria-afif.github.io/" target="_blank"
+        rel="noopener noreferrer" id="github-profile-link">GitHub Profile</a>
+    </div>
+  </footer>
+
+  <div id="projectModal" class="modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="modalTitle"
+    aria-describedby="modalDescription">
+    <div class="modal-overlay" tabindex="-1" data-close-modal></div>
+    <div class="modal-content" role="document">
+      <button class="modal-close-btn" aria-label="Close detail view" data-close-modal>
+        <span class="material-icons">close</span>
+      </button>
+      <h2 id="modalTitle" class="modal-title"></h2>
+      <div class="modal-body">
+        <img id="modalImage" alt="" class="modal-image" />
+        <div class="modal-text">
+          <p id="modalDescription" class="modal-description"></p>
+          <ul class="modal-meta-list" aria-label="Project details">
+            <li><strong>Language:</strong><span id="modalLanguage"></span></li>
+            <li><strong>Stars:</strong><span id="modalStars"></span></li>
+            <li><strong>Last Updated:</strong><time id="modalUpdated"></time></li>
+            <li><strong>Created On:</strong><time id="modalCreated"></time></li>
+          </ul>
+          <p>
+            <a id="modalRepoLink" href="#" target="_blank" rel="noopener noreferrer" class="btn btn-primary"
+              aria-label="Open GitHub repository in new tab">View on GitHub/<a>
+          </p>
+        </div>
+      </div>
+    </div>
   </div>
-</header>
 
-<main class="container" role="main" aria-live="polite" aria-busy="false">
-  <div id="loading" class="status-message">Loading projects, please wait...</div>
-  <div id="error-message" class="status-message error" role="alert" hidden></div>
-  <button id="retry-btn" class="btn retry" style="display:none;">Retry</button>
-  <section id="projects" class="projects-grid" aria-label="GitHub project repositories"></section>
-</main>
+  <script src="scripts.js"></script>
 
-<footer>
-  <div>
-    &copy; <span id="year"></span> <a href="https://github.com/satria-afif" target="_blank" rel="noopener noreferrer" id="github-profile-link">GitHub Profile</a>
-  </div>
-</footer>
-
-<script src="scripts.js"></script>
 </body>
 </html>
